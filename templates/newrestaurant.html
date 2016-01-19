@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>NewRestaurant</title>
+		<link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='styles/stylesheet.css') }}"/>
+	</head>
+
+	<body>
+		
+		<h1>New Restaurant</h1>
+		
+		<form action="{{url_for('newRestaurant')}}" method= 'POST'>
+			<p>Name:</p>
+			<input type = 'text' size = '60' name = 'name'>
+			<p>Logo Picture:</p>
+			<input type = 'text' size = '60' name = 'logo'>
+			<p>Interior Picture:</p>
+			<input type = 'text' size = '60' name = 'interior'>
+			<p>Restaurant Web Link:</p>
+			<input type = 'text' size = '60' name = 'link'>
+			<p>Neighborhood:</p>
+			<select name = 'neighborhood'>
+				<option value = '' selected disabled>Please Select:</option>
+				<option value = 'Art Museum'>Art Museum</option>
+				<option value = 'Bella Vista'>Bella Vista</option>
+				<option value = 'Fairmount'>Fairmount</option>
+				<option value = 'Fishtown'>Fishtown</option>
+				<option value = 'Fitler Square'>Fitler Square</option>
+				<option value = 'Graduate Hospital'>Graduate Hospital</option>
+				<option value = 'Italian Market'>Italian Market</option>
+				<option value = 'Midtown Village'>Midtown Village</option>
+				<option value = 'Northern Liberties'>Northern Liberties</option>
+				<option value = 'Old City'>Old City</option>
+				<option value = 'Passyunk Square'>Passyunk Square</option>
+				<option value = 'Point Breeze'>Point Breeze</option>
+				<option value = 'Queen Village'>Queen Village</option>
+				<option value = 'Rittenhouse'>Rittenhouse</option>
+				<option value = 'Society Hill'>Society Hill</option>
+				<option value = 'University City'>University City</option>
+				<option value = 'Washington Square'>Washington Square</option>
+			</select>
+			<p>Street Address:</p>
+			<input type = 'text' size = '60' name = 'street'>
+			<p>City:</p>
+			<input type = 'text' size = '60' name = 'city'>
+			<p>State:</p>
+			<input type = 'text' size = '60' name = 'state'>
+			<p>Zip Code:</p>
+			<input type = 'text' size = '60' name = 'zipcode'>
+			<p>Food Type:</p>
+			<select name = 'foodtype'>
+				<option value = '' selected disabled>Please Select:</option>
+				<option value = 'American'>American</option>
+				<option value = 'Brazilian'>Brazilian</option>
+				<option value = 'British'>British</option>
+				<option value = 'Chinese'>Chinese</option>
+				<option value = 'Ethiopian'>Ethiopian</option>
+				<option value = 'French'>French</option>
+				<option value = 'German'>German</option>
+				<option value = 'Greek'>Greek</option>
+				<option value = 'Indian'>Indian</option>
+				<option value = 'Italian'>Italian</option>
+				<option value = 'Japanese'>Japanese</option>
+				<option value = 'Mexican'>Mexican</option>
+				<option value = 'Middle Eastern'>Middle Eastern</option>
+				<option value = 'Spanish'>Spanish</option>
+				<option value = 'Thai'>Thai</option>
+				<option value = 'Vietnamese'>Vietnamese</option>
+			</select>
+			</br></br>
+			<input type = 'submit' value = 'Create'>
+			<a href = '{{url_for('restaurantList')}}'>Cancel</a>
+		</form>
+	</body>
+</html>

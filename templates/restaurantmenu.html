@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Menu</title>
+		<link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='styles/stylesheet.css') }}"/>
+	</head>
+	<body>
+		
+		<h1>{{ restaurant.name }}</h1>
+		<a href='{{url_for('editRestaurant', restaurant_id = restaurant.id)}}'>Edit Restaurant</a>
+		</br>
+		<a href='{{url_for('restaurantList')}}'>Back to Main Menu</a>
+		</br>
+		<a href='{{url_for('newMenuItem', restaurant_id = restaurant.id)}}' >Create New Menu Item</a>
+
+	</br></br>
+
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+
+				<ul>
+				{% for message in messages %}
+					<li> {{ message }} </li>
+				{% endfor %}
+				</ul>
+			
+			{% endif %}
+		{% endwith %}
+
+		{% if brunchescount > 0 %}
+
+			<h2>Brunch</h2>
+		
+			{% for i in brunches %}
+
+			<p>
+			{{i.name}}
+			</br>
+
+			{{i.description}}
+			</br>
+
+			{{i.price}}
+			</br>
+			</p>
+			<a href='{{url_for('editMenuItem', restaurant_id = restaurant.id, menu_id = i.id)}}' >Edit</a>
+		
+			</br>
+
+			<a href='{{url_for('deleteMenuItem', restaurant_id = restaurant.id, menu_id = i.id)}}'>Delete</a>
+
+			</br>
+			</br>
+
+			{% endfor %}
+		{% endif %}
+
+		{% if appscount > 0 %}
+			<h2>Appetizers</h2>
+			{% for i in apps %}
+
+			<p>
+			{{i.name}}
+			</br>
+
+			{{i.description}}
+			</br>
+
+			{{i.price}}
+			</br>
+			</p>
+			<a href='{{url_for('editMenuItem', restaurant_id = restaurant.id, menu_id = i.id)}}' >Edit</a>
+		
+			</br>
+
+			<a href='{{url_for('deleteMenuItem', restaurant_id = restaurant.id, menu_id = i.id)}}'>Delete</a>
+
+			</br>
+			</br>
+
+			{% endfor %}
+		{% endif %}
+		
+		{% if entreescount > 0 %}
+			<h2>Entrees</h2>
+			{% for i in entrees %}
+
+			<p>
+			{{i.name}}
+			</br>
+
+			{{i.description}}
+			</br>
+
+			{{i.price}}
+			</br>
+			</p>
+			<a href='{{url_for('editMenuItem', restaurant_id = restaurant.id, menu_id = i.id)}}' >Edit</a>
+		
+			</br>
+
+			<a href='{{url_for('deleteMenuItem', restaurant_id = restaurant.id, menu_id = i.id)}}'>Delete</a>
+
+			</br>
+			</br>
+
+			{% endfor %}	
+		{% endif %}
+		
+		{% if dessertscount > 0 %}
+			<h2>Desserts</h2>
+			{% for i in desserts %}
+
+			<p>
+			{{i.name}}
+			</br>
+
+			{{i.description}}
+			</br>
+
+			{{i.price}}
+			</br>
+			</p>
+			<a href='{{url_for('editMenuItem', restaurant_id = restaurant.id, menu_id = i.id)}}' >Edit</a>
+		
+			</br>
+
+			<a href='{{url_for('deleteMenuItem', restaurant_id = restaurant.id, menu_id = i.id)}}'>Delete</a>
+
+			</br>
+			</br>
+
+			{% endfor %}
+		{% endif %}
+	</body>
+
+
+</html>

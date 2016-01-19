@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Restaurants</title>
+	<link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='styles/stylesheet.css') }}"/>
+</head>
+<body>
+	
+	<h1>Restaurant List</h1>
+	<a href = '{{url_for('newRestaurant')}}'>Add New Restaurant</a>
+	</br>
+
+	
+	{% for i in restaurants %}
+	<div>
+	<a href='{{url_for('restaurantMenu', restaurant_id = i.id)}}' >
+		<img src= {{url_for('static', filename = 'images/Wallpaper.jpg')}} class='img-icon'>
+	</a>
+	
+	<h2>{{i.name}}</h2>
+
+	</br>
+	</div>
+	{% endfor %}
+	
+
+</body>
+</html>
