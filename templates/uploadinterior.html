@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>UploadInterior</title>
+	<link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='styles/stylesheet.css') }}"/>
+</head>
+<body>
+<h1>Upload Restaurant Interior</h1>
+</br>
+<form method='POST' enctype='multipart/form-data'>
+	<input type = 'file' name = 'photo'>
+	<input type="submit" value = 'Upload'>
+	<a href = '{{url_for('restaurantList')}}'>Cancel</a>
+</form>
+</body>
+</html>

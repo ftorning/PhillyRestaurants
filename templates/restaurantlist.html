@@ -5,16 +5,15 @@
 	<link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='styles/stylesheet.css') }}"/>
 </head>
 <body>
-	
 	<h1>Restaurant List</h1>
 	<a href = '{{url_for('newRestaurant')}}'>Add New Restaurant</a>
 	</br>
 
 	
 	{% for i in restaurants %}
-	<div>
+	<div class="photos">
 	<a href='{{url_for('restaurantMenu', restaurant_id = i.id)}}' >
-		<img src= {{url_for('static', filename = 'images/Wallpaper.jpg')}} class='img-icon'>
+		<img class="img-icon" src="{{url_for('static', filename = i.logo)}}">
 	</a>
 	
 	<h2>{{i.name}}</h2>

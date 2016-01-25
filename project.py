@@ -2,12 +2,11 @@ from flask import Flask, render_template, url_for, request, redirect, flash, jso
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Restaurant, MenuItem, User
-
+import os
 app = Flask(__name__)
 
 #File Uploads
-from werkzeug import secure_filename
-import os
+from flask.ext.uploads import UploadSet, configure_uploads, IMAGES
 
 #OAuth
 from flask import session as login_session
@@ -25,11 +24,11 @@ import requests
 # CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 # APPLICATION_NAME = "Philly Restaurants App"
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/images')
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+photos = UploadSet('photos', IMAGES)
+app.config['UPLOADED_PHOTOS_DEST'] = 'static/img'
+configure_uploads(app, photos)
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg'])
 
 engine = create_engine('sqlite:///phillyrestaurants.db')
 Base.metadata.bind = engine
@@ -40,7 +39,6 @@ session = DBSession()
 
 #API Endpoints (GET Request)
 
-#JSON
 #@app.route('/restaurants/<int:restaurant_id>/JSON/')
 #def restaurantMenuJSON(restaurant_id):
 #    restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
@@ -53,6 +51,7 @@ session = DBSession()
 #    return jsonify(MenuItem=[item.serialize])
 
 #Google Auth
+
 #@app.route('/gconnect', methods = ['POST'])
 #def gconnect():
     # Validate state token
@@ -185,21 +184,7 @@ session = DBSession()
 #     #return "The current session state is %s" % login_session['state']
 #     return render_template('login.html', STATE=state)
 
-# File Uploading
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return filename
-
-#Main rsetaurant page and adding new restaurant
+#Main restaurant page and adding new restaurant
 @app.route('/')
 @app.route('/restaurants/')
 def restaurantList():
@@ -213,11 +198,13 @@ def newRestaurant():
         session.add(newRestaurant)
         session.commit()
         flash('New restaurant created!')
+        restaurantFolder = 'static/img/'+ str(newRestaurant.id)
+        os.mkdir(restaurantFolder)
         return redirect(url_for('restaurantList'))
     else :
         return render_template('newrestaurant.html')
 
-# #Restaurant specific page with editing restaurant, adding menu item, editing menu item
+#Restaurant specific page with editing restaurant, adding menu item, editing menu item
 @app.route('/restaurants/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id):
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
@@ -229,49 +216,87 @@ def restaurantMenu(restaurant_id):
     dessertscount = desserts.count()
     brunches = session.query(MenuItem).filter_by(restaurant_id=restaurant.id, course = "Brunch")
     brunchescount = brunches.count()
-    return render_template('restaurantmenu.html', restaurant=restaurant, apps=apps, entrees=entrees, desserts=desserts, brunches=brunches, appscount=appscount, entreescount=entreescount, dessertscount=dessertscount, brunchescount=brunchescount) 
+    drinks = session.query(MenuItem).filter_by(restaurant_id=restaurant.id, course = "Drink")
+    drinkscount = drinks.count()
+    sides = session.query(MenuItem).filter_by(restaurant_id=restaurant.id, course = "Side")
+    sidescount = sides.count()
+    return render_template('restaurantmenu.html', restaurant=restaurant, apps=apps, entrees=entrees, desserts=desserts, brunches=brunches, drinks=drinks, sides = sides, appscount=appscount, entreescount=entreescount, dessertscount=dessertscount, brunchescount=brunchescount, drinkscount = drinkscount, sidescount = sidescount) 
 
-# @app.route('/restaurants/<int:restaurant_id>/deleterestaurant/', methods=['GET', 'POST'])
-# def deleteMenuItem(restaurant_id):
-#     #if 'username' not in login_session:
-#     #    return redirect('/login/')
-#     itemToDelete = session.query(Restaurant).filter_by(id=restaurant_id).one()
-#     if request.method == 'POST' :
-#         deleteRestaurant = Restaurant(name = request.form['name'], logo = request.form['logo'], interior = request.form['interior'], link = request.form['link'], neighborhood = request.form['neighborhood'], street = request.form['street'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'], foodtype =request.form['foodtype'])
-#         session.delete(deleteRestaurant)
-#         session.commit()
-#         flash('%s restaurant deleted!' % restaurant.name)
-#         return redirect(url_for('restaurantList', restaurant_id = restaurant_id))
-#     else :
-#         return render_template('deletemenuitem.html', restaurant_id = restaurant_id, item = itemToDelete)
+@app.route('/restaurants/<int:restaurant_id>/deleterestaurant/', methods=['GET', 'POST'])
+def deleteRestaurant(restaurant_id):
+    #if 'username' not in login_session:
+    #    return redirect('/login/')
+    restaurantToDelete = session.query(Restaurant).filter_by(id=restaurant_id).one()
+    if request.method == 'POST' :
+        #deleteRestaurant = Restaurant(name = request.form['name'], logo = request.form['logo'], interior = request.form['interior'], link = request.form['link'], neighborhood = request.form['neighborhood'], street = request.form['street'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'], foodtype =request.form['foodtype'])
+        session.delete(restaurantToDelete)
+        session.commit()
+        return redirect(url_for('restaurantList'))
+    else :
+        return render_template('deleteRestaurant.html', restaurant_id = restaurant_id, i = restaurantToDelete)
+
+# File Uploading
+@app.route('/restaurants/<int:restaurant_id>/uploadlogo/', methods=['GET', 'POST'])
+def uploadLogo(restaurant_id):
+    if request.method == 'POST' and 'photo' in request.files:
+        updatedRestaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
+        filepath = 'static/img/'+ str(updatedRestaurant.id) + '/' + str(updatedRestaurant.id) + 'logo.jpg'
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        filepath = 'static/img/'+ str(updatedRestaurant.id) + '/' + str(updatedRestaurant.id) + 'logo.png'
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        filename = photos.save(request.files['photo'], folder=str(updatedRestaurant.id),name=str(updatedRestaurant.id)+'logo.')
+        updatedRestaurant.logo = 'img/' + filename
+        flash("Photo saved.")
+        session.add(updatedRestaurant)
+        session.commit()
+        return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
+    else:
+        return render_template('uploadlogo.html')
+
+@app.route('/restaurants/<int:restaurant_id>/uploadinterior/', methods=['GET', 'POST'])
+def uploadInterior(restaurant_id):
+    if request.method == 'POST' and 'photo' in request.files:
+        updatedRestaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
+        filepath = 'static/img/'+ str(updatedRestaurant.id) + '/' + str(updatedRestaurant.id) + 'interior.jpg'
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        filepath = 'static/img/'+ str(updatedRestaurant.id) + '/' + str(updatedRestaurant.id) + 'interior.png'
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        filename = photos.save(request.files['photo'], folder=str(updatedRestaurant.id),name=str(updatedRestaurant.id)+'interior.')
+        updatedRestaurant.interior = 'img/'+ filename
+        flash("Photo saved.")
+        session.add(updatedRestaurant)
+        session.commit()
+        return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
+    else:
+        return render_template('uploadinterior.html')
 
 @app.route('/restaurants/<int:restaurant_id>/editrestaurant/', methods=['GET','POST'])
 def editRestaurant(restaurant_id):
     editedRestaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     if request.method == 'POST' :
         if request.form['name']:
-            editedrestaurant.name = request.form['name']
-        if request.form['logo']:
-            editedrestaurant.logo = request.form['logo']
-        if request.form['interior']:
-            editedrestaurant.interior = request.form['interior']
+            editedRestaurant.name = request.form['name']
         if request.form['link']:
-            editedrestaurant.link = request.form['link'] 
+            editedRestaurant.link = request.form['link'] 
         if request.form['neighborhood']:
-            editedrestaurant.neighborhood = request.form['neighborhood'] 
+            editedRestaurant.neighborhood = request.form['neighborhood'] 
         if request.form['street']:
-            editedrestaurant.street = request.form['street'] 
+            editedRestaurant.street = request.form['street'] 
         if request.form['city']:
-            editedrestaurant.city = request.form['city'] 
+            editedRestaurant.city = request.form['city'] 
         if request.form['state']:
-            editedrestaurant.state = request.form['state'] 
+            editedRestaurant.state = request.form['state'] 
         if request.form['zipcode']:
-            editedrestaurant.zipcode = request.form['zipcode'] 
+            editedRestaurant.zipcode = request.form['zipcode'] 
         if request.form['foodtype']:
-            editedrestaurant.foodtype = request.form['foodtype']
+            editedRestaurant.foodtype = request.form['foodtype']
         session.add(editedRestaurant)
         session.commit()
-        flash ("%s restaurant edited!" % restaurant.name)
+        flash("Restaurant edited!")
         return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
     else:
         return render_template('editrestaurant.html', restaurant_id = restaurant_id, i = editedRestaurant)

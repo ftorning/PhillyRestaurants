@@ -58,7 +58,8 @@ class Restaurant(Base) :
 	id = Column(Integer, primary_key = True)
 	user_id = Column(Integer, ForeignKey('user.id'))
 	user = relationship(User)
-
+	MenuItems = relationship("MenuItem", cascade="all,delete")
+	
 class MenuItem(Base) :
 	__tablename__ = 'menu_item'
 	name = Column(String(80), nullable = False)
