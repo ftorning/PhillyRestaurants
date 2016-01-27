@@ -1,11 +1,3 @@
-#configuration code
-#	generally shouldn't change from project to project
-#at the beginning of the file
-#	imports all modules needed
-#	creates instance of declarative base
-#at the end of the file
-#	creates (or connects) the database and adds tables and columns
-
 import sys
 
 from sqlalchemy import Column, ForeignKey, Integer, String
@@ -18,24 +10,6 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
-#class code
-#	representation of table as a python class
-#	extends the Base class
-#	nested inside will be table and mapper code
-#table code
-#	representation of our table inside the database
-#	__tablename__ = 'some_table'
-#mapper code
-#	maps python objects to columns in our database
-#	columnName = Column(attributes, ...)
-#	examples:
-#		String(250)
-#		Integer
-#		relationship(Class)
-#		nullable = False
-#		primary_key = True
-#		ForeignKey('some_table.id')
-
 class User(Base) :
 	__tablename__ = 'user'
 	name = Column(String(80), nullable = False)
@@ -43,6 +17,15 @@ class User(Base) :
 	picture = Column(String(250), nullable = False)
 	id = Column(Integer, primary_key = True)
 
+	@property
+	def serialize(self):
+	    return {
+	    	'name' : self.name,
+	    	'email' : self.email,
+	    	'picture' : self.picture,
+	    	'id' : self.id,
+	    }
+	
 class Restaurant(Base) :
 	__tablename__ = 'restaurant'
 	name = Column(String(80), nullable = False)
@@ -59,6 +42,21 @@ class Restaurant(Base) :
 	user_id = Column(Integer, ForeignKey('user.id'))
 	user = relationship(User)
 	MenuItems = relationship("MenuItem", cascade="all,delete")
+
+	@property
+	def serialize(self):
+		#returns object data in easily serializable format
+		return {
+			'name' : self.name,
+			'link' : self.link,
+			'neighborhood' : self.neighborhood,
+			'street' : self.street,
+			'city' : self.city,
+			'state' : self.state,
+			'zipcode' : self.zipcode,
+			'foodtype' : self.foodtype,
+			'id' : self.id,
+		}
 	
 class MenuItem(Base) :
 	__tablename__ = 'menu_item'
@@ -77,9 +75,10 @@ class MenuItem(Base) :
 		#returns object data in easily serializable format
 		return {
 			'name' : self.name,
+			'course' : self.course,
 			'description' : self.description,
-			'id' : self.id,
 			'price' : self.price,
+			'id' : self.id,
 		}
 
 engine = create_engine('sqlite:///phillyrestaurants.db')

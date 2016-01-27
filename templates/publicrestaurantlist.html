@@ -6,12 +6,8 @@
 </head>
 <body>
 	<h1>Restaurant List</h1>
-	<h3>Hi {{ user.name }}!</h3>
-	<a href = '{{url_for('gdisconnect')}}'>Logout</a>
-	<a href = '{{url_for('newRestaurant')}}'>Add New Restaurant</a>
-	</br>
-
-	
+	<a href = '{{url_for('showLogin')}}'>Login</a>
+	</br>	
 	{% for i in restaurants %}
 	<div class="photos">
 	<a href='{{url_for('restaurantMenu', restaurant_id = i.id)}}' >
