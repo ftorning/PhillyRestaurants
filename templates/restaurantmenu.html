@@ -6,7 +6,11 @@
 	</head>
 	<body>
 		<div class="pane">
-			<img src="{{url_for('static', filename = restaurant.interior)}}", style= width:100%;>
+			{% if restaurant.interior %}
+				<img src="{{url_for('static', filename = restaurant.interior)}}", style= width:100%;>
+			{% else %}
+				<img class="img-icon" src="{{url_for('static', filename= 'img/placeholder.png')}}">
+			{% endif %}
 			<a href="{{ restaurant.link }}"><h1>{{ restaurant.name }}</h1></a>
 			<a href='{{url_for('editRestaurant', restaurant_id = restaurant.id)}}'>Edit Restaurant Details</a>
 			</br>

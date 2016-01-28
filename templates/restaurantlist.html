@@ -8,14 +8,19 @@
 	<h1>Restaurant List</h1>
 	<h3>Hi {{ user.name }}!</h3>
 	<a href = '{{url_for('gdisconnect')}}'>Logout</a>
+	</br>
 	<a href = '{{url_for('newRestaurant')}}'>Add New Restaurant</a>
 	</br>
 
 	
 	{% for i in restaurants %}
 	<div class="photos">
-	<a href='{{url_for('restaurantMenu', restaurant_id = i.id)}}' >
-		<img class="img-icon" src="{{url_for('static', filename = i.logo)}}">
+	<a href='{{url_for('restaurantMenu', restaurant_id = i.id)}}'>
+		{% if i.logo %}
+			<img class="img-icon" src="{{url_for('static', filename = i.logo)}}">
+		{% else %}
+			<img class="img-icon" src="{{url_for('static', filename= 'img/placeholder.png')}}">
+		{% endif %}
 	</a>
 	
 	<h2>{{i.name}}</h2>
