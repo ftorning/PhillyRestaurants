@@ -291,7 +291,7 @@ def deleteRestaurant(restaurant_id):
         session.commit()
         return redirect(url_for('restaurantList'))
     else:
-        return render_template('deleteRestaurant.html',
+        return render_template('deleterestaurant.html',
                                 restaurant_id=restaurant_id,
                                 i=restaurantToDelete)
 
